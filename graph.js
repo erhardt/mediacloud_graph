@@ -9,7 +9,7 @@ var GRAPH_WIDTH       = 570,
     HIST_MARGIN       = 4,
     Y_MARGIN          = 60,
     DURATION          = 1500,
-    LINK_DELAY_WITH_TRANS = 0000,
+    LINK_DELAY_WITH_TRANS = 1300,
     LINK_DELAY_NO_TRANS = 50,
     LINK_DELAY        = LINK_DELAY_WITH_TRANS,
     LINK_DURATION     = 1000,
@@ -96,7 +96,7 @@ function animate(frame, i) {
     var updateTransition = updateGroup(nodes);
     updateCircle(updateTransition);
     updateText(updateTransition);
-    updateLink(d3.selectAll('line.link'), frame);
+    updateLink(links, frame);
 
     // Exit
     var exit = nodes.exit().classed('removing', true),
@@ -106,7 +106,7 @@ function animate(frame, i) {
     exitTrans.remove();
     links.exit().remove();
 
-    //hideLinks(d3.selectAll('line.link'));
+    hideLinks(links);
     hideLabels(nodes);
 
     // Update the histogram and play button
@@ -132,7 +132,7 @@ function animate(frame, i) {
     // Show links
     var selectedNode = d3.select('g.node.selected');
     if (!d3.select('#show-links:checked').empty()) {
-        showLinks(d3.selectAll('line.link'), LINK_DELAY);
+        showLinks(links, LINK_DELAY);
     } else if (!selectedNode.empty()) {
         showLinks(getNodeLinks(selectedNode), LINK_DELAY);
     }
@@ -279,7 +279,7 @@ function addGroup(nodes) {
 function addLink(frame, links) {
     var newLinks = links 
         .insert("line", 'g.node')
-        //    .style('marker-end', 'url(#triangle)')
+        //.style('marker-end', 'url(#triangle)')
         .classed('link', true)
         .classed('hidden', true)
         .attr('id', function(l) { return 'link-' + l.source + '-' + l.target; })
