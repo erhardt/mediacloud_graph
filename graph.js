@@ -36,7 +36,8 @@ var GRAPH_WIDTH       = 570,
         { key: 'code_media_type', label: 'Media Type'},
         { key: 'story_count', label: 'Story Count'}
     ],
-    all_frames        = null;
+    all_frames        = null,
+    selected_node     = null;
 
 PI_TIME = calculatePi();
 if (PI_TIME >= MAX_PI_TIME) {
@@ -98,7 +99,7 @@ function animate(frame, i) {
     updateLink(d3.selectAll('line.link'), frame);
 
     // Exit
-    var exit = nodes.exit(),
+    var exit = nodes.exit().classed('removing', true),
         exitTrans = exit.transition();
     exitTrans.select('circle').attr('r', 0);
     exitTrans.select('text.label').style('font-size', '0px');
@@ -107,9 +108,6 @@ function animate(frame, i) {
 
     //hideLinks(d3.selectAll('line.link'));
     hideLabels(nodes);
-
-    // Keep slider in sync with playing
-    if (typeof i != 'undefined') { $('#date-slider').slider('value', i); }
 
     // Update the histogram and play button
     var frame_index = all_frames.indexOf(frame);
@@ -124,9 +122,11 @@ function animate(frame, i) {
     updateFrameNarrative(frame);
 
     // Keep node-info in sync with data in node
-    userSelected = d3.select('g.node.selected');
+    userSelected = d3.select('g.node.selected:not(.removing)');
     if (!userSelected.empty()) {
         populateNodeInfo(userSelected.data()[0]);
+    } else if (selected_node != null) {
+        d3.select('#node-info').html('<em>Does not appear in current week</em>');
     }
 
     // Show links
@@ -146,7 +146,7 @@ function animate(frame, i) {
 
     // If selected nodes are removed, make everything normal again
     if (!exit.filter('.selected').empty()) {
-        unhighlightNode();
+        //unhighlightNode();
     }
 }
 
@@ -272,7 +272,7 @@ function addGroup(nodes) {
         .attr('id', function(n) { return 'node-' + n.id; })
         .attr("transform", function(n) { return "translate("
             + n.denormPosition.x + "," + n.denormPosition.y + ")"; })
-        .classed('not-selected', function() { return !d3.select('.not-selected').empty(); });
+        .classed('not-selected', function(n) { return !d3.select('.not-selected').empty() && n.id != selected_node; });
     return group;
 }
 
@@ -310,7 +310,8 @@ function addText(group) {
 }
 
 function updateGroup(nodes) {
-    nodes.classed('narrated', function(n) { return n.narrative; });
+    nodes.classed('narrated', function(n) { return n.narrative; })
+        .classed('selected', function(n) { return selected_node == n.id; })
     if (DISABLE_TRANS) { 
         var trans = nodes;
     } else {
@@ -482,6 +483,7 @@ function getNodeLinks(node, type) {
 
 function highlightNode(node) {
     d3.select(this).classed('selected', true);
+    selected_node = this.id.slice(5);
 
     if (d3.select('#show-labels:checked').empty()) { 
         d3.selectAll('text.label').classed('hidden', true);
@@ -498,6 +500,7 @@ function highlightNode(node) {
 }
 
 function unhighlightNode() {
+    selected_node = null;
     d3.selectAll('g.node').classed('not-selected', false).classed('selected', false);
     hideLinks(d3.selectAll('line.link'));
     if (d3.select('#show-labels:checked').empty()) {
@@ -601,8 +604,9 @@ function play_toggle(frames) {
         d3.select('#play button').html('&#9654;');
     } else {
         frames.forEach(function(frame, i) {
+            if (last_value == frames.length - 1) { last_value = 0; }
             if (i >= last_value) {
-                player_timeouts.push(setTimeout(animate, (i - last_value) * TIMEOUT, frame, i));
+                player_timeouts.push(setTimeout(changeToFrame, (i - last_value) * TIMEOUT, i));
             }
         })
         is_playing = true;
@@ -611,6 +615,10 @@ function play_toggle(frames) {
     }
 }
 
+function changeToFrame(i) { $('#date-slider').slider('value', i); }
+    
+
+// This stuff is here to test benchmark, but it's not good right now.
 function testRendering() {
     var startTest = top.startTest || function(){};
     var test = top.test || function(name, fn){ fn(); };
