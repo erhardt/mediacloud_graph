@@ -1,0 +1,136 @@
+@charset "utf-8";
+/* CSS Document */
+
+a:link {color:#41ad00;}      
+a:hover {color:#3c7718;}  
+a:active {color:#3c7718;}
+a:visited {color:#3c7718;}
+
+body{
+	font-family:"Open Sans", Helvetica, sans-serif; 
+	font-size:11pt; margin:0px; 
+	color:#333	
+}
+
+#container {
+	width:900px; 
+	margin: 0px auto;
+}
+
+#header {margin-bottom:10px; 
+		padding-bottom:10px; 
+		border-bottom:2px dotted #92c5f3;
+}
+
+#logo{	float:right; 
+		margin:0px; padding:0px;
+}
+
+#title {	float:right; 
+		text-align:right; 
+		padding:5px 15px 5px 0px; 
+		font-family:"Lustria", 'Times New Roman', Times, serif; 
+		font-weight:bold; 
+		font-size:20pt; 
+		color:#5fa9ee;
+}
+
+#navigation {float:right; 
+		text-align:right; 
+		padding:0px 15px 5px 0px;
+}
+
+#subtitle {width:100%; 
+		text-align:left; 
+		margin-bottom:10px; 
+		font-weight:bold; 
+		color:#999966; 
+		font-size:14pt;
+}
+
+#content {
+		width:300px; 
+		float:left; 
+		height:auto;	
+}
+
+#aboutProject {
+        border:0px solid #999966; 
+		border-width:1px 0px 1px 0px; 
+		font-size: 10pt; 
+		text-align:justify; 
+		padding:5px; 
+		font-weight:bold; 
+		color:#999966;
+}
+
+#start-date {padding-top:10px; 
+		font-weight:bold; 
+		font-size: 14pt;
+        text-align: center;
+}
+
+#mediaSource  {border:dotted #ababab 1px; 
+		padding:5px; 
+		margin-top:15px; 
+		color:#666; 
+		font-size:10pt
+	}
+	
+#map {	margin-left:5px; 
+		float:right; 
+		height:auto; 
+		width:580px
+}
+
+#mapImage {border:1px #000 solid; 
+			padding:3px; 
+			height:auto;
+}
+
+#mapController {padding:3px; 
+		background-color:#d9d9a6; 
+		margin-top:3px; 
+		height:auto;
+}
+
+#histogram {background-color:#fbfbd6; 
+		padding:2px; 
+		height:auto; 
+		width:570px; 
+		height:50px;
+}
+
+#controls {padding:0px; 
+		height:auto; 
+		padding-top:7px;
+}
+
+#slider {width:465px; 
+		float:right; 
+		border:0px black solid; 
+		background-image:url(images/timeline.gif); 
+		height:37px; 
+		margin-right:5px; 
+		padding:0px 20px 0px 20px; 
+		background-repeat:no-repeat;
+}
+
+#dates {width:505px; 
+		float:right; 
+		margin-right:5px; 
+		color:#666666; 
+		font-weight:bold;
+}
+
+#selectors {padding-top:5px; 
+		text-align:center;
+}
+
+#footer {width:100%; 
+		margin-top:10px; 
+		border-top:2px dotted #92c5f3; 
+		padding:10px 0px 10px 0px; 
+		text-align:right; 
+		font-style:italic; 
+}

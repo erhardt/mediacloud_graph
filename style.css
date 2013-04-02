@@ -1,0 +1,122 @@
+g.node {
+    cursor: pointer;
+}
+g.not-selected circle {
+    fill-opacity: 0.3;
+    stroke-opacity: 0.3;
+}
+g.not-selected text {
+    opacity: 0.3;
+}
+g.selected circle {
+    /*
+    stroke-width: 4px;
+    stroke: red;
+    */
+}
+g.connected circle {
+    fill-opacity: 1;
+}
+g.narrated circle {
+    stroke-width: 2px;
+    /*stroke:  url(#highlight);*/
+    stroke: black;
+}
+text.label.hidden, line.link.hidden {
+    display: none;
+}
+g.selected text {
+}
+line.link {
+    stroke: #aaa;
+    opacity: 0.7;
+}
+#graph {
+    width: 577px;
+    height: 577px;
+    border: 1px dotted #ababab;
+}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    background: #9B9C77;
+}
+.ui-slider .ui-slider-handle {
+    width: 2.2em;
+    height: 2.2em;
+    border-radius: 11px;
+    top: -1.05em;
+    border: 0px;
+}
+.ui-widget-content.ui-slider-horizontal {
+    height: 1px;
+    border: 0px;
+    background: white;
+    margin-top: 1.1em;
+}
+.ui-widget-content.ui-slider-horizontal::before {
+    content: " ";
+    background: white;
+    width: 1.1em;
+    height: 1.1em;
+    display: block;
+    border-radius: 50%;
+    top: -0.5em;
+    position: relative;
+}
+.ui-widget-content.ui-slider-horizontal::after {
+    content: " ";
+    background: white;
+    width: 1.1em;
+    height: 1.1em;
+    display: block;
+    border-radius: 50%;
+    top: -1.6em;
+    left: 98%;
+    position: relative;
+}
+.ui-widget-header {
+    background: white;
+}
+#slider-wrapper {
+    float: right;
+    margin-right: 40px;
+}
+#play {
+    width: 39px;
+    height: 53px;
+    float: left;
+    color: white;
+    font-weight: 800;
+    text-align: center;
+    font-size: 0.8em;
+    margin-left: 1em;
+}
+#play button:hover {
+    cursor: pointer;
+    color: orange;
+}
+
+#play button {
+    width: 38px;
+    height: 38px;
+    line-height: 34px;
+    background: white;
+    border:0;
+    border-radius:11px;
+    color: #FFDDA0;
+    padding-left: 10px;
+    padding-bottom: 10px;
+    font-size: 2em;
+}
+#histogram {
+    white-space: nowrap;
+    padding: 0;
+    margin: 0;
+}
+#histogram .bar {
+    display: inline-block;
+    margin: 0;
+    background-color: #9B9C77;
+}
+#histogram .bar.highlight {
+    background-color: orange;
+}
