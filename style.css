@@ -120,3 +120,18 @@ line.link {
 #histogram .bar.highlight {
     background-color: orange;
 }
+#frame-info {
+    font-size: 0.9em;
+}
+#node-info {
+    font-size: 0.75em;
+}
+#node-info dt {
+    font-weight: bold;
+}
+#node-info dd {
+    margin: 0 0 0.6em 2em;
+}
+#node-narrative p {
+    margin: 0 0 2em 0;
+}

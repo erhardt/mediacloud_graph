@@ -382,23 +382,23 @@ function updateFrameNarrative(frame) {
         var start_date = new Date(frame.start_date),
             end_date   = new Date(frame.end_date);
         d3.select('#start-date').text(function() { 
-            if (start_date.getMonth() == end_date.getMonth()) {
-                return month_names[start_date.getMonth()].substr(0, 3)
-                + ' ' + start_date.getDate()
-                + ' - ' + end_date.getDate()
+            if (start_date.getUTCMonth() == end_date.getUTCMonth()) {
+                return month_names[start_date.getUTCMonth()].substr(0, 3)
+                + ' ' + start_date.getUTCDate()
+                + ' - ' + end_date.getUTCDate()
                 + ', ' + end_date.getFullYear();
             } else if (start_date.getFullYear() == end_date.getFullYear()) {
-                return month_names[start_date.getMonth()].substr(0, 3)
-                + ' ' + start_date.getDate()
-                + ' - ' + month_names[end_date.getMonth()].substr(0, 3)
-                + ' ' + end_date.getDate()
+                return month_names[start_date.getUTCMonth()].substr(0, 3)
+                + ' ' + start_date.getUTCDate()
+                + ' - ' + month_names[end_date.getUTCMonth()].substr(0, 3)
+                + ' ' + end_date.getUTCDate()
                 + ', ' + end_date.getFullYear();
             } else {
-                return month_names[start_date.getMonth()].substr(0, 3)
-                + ' ' + start_date.getDate()
+                return month_names[start_date.getUTCMonth()].substr(0, 3)
+                + ' ' + start_date.getUTCDate()
                 + ', ' + start_date.getFullYear();
-                + ' - ' + month_names[end_date.getMonth()].substr(0, 3)
-                + ' ' + end_date.getDate()
+                + ' - ' + month_names[end_date.getUTCMonth()].substr(0, 3)
+                + ' ' + end_date.getUTCDate()
                 + ', ' + end_date.getFullYear();
             }
         });
