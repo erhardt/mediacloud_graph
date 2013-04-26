@@ -1,5 +1,5 @@
 var GRAPH_WIDTH       = 570,
-    GRAPH_HEIGHT      = 570,
+    GRAPH_HEIGHT      = 500,
     MAX_SIZE          = 20,
     MIN_SIZE          = 3,
     MAX_FONT_SIZE     = 36,
@@ -102,7 +102,7 @@ function animate(frame, i) {
     var exit = nodes.exit().classed('removing', true),
         exitTrans = exit.transition();
     exitTrans.select('circle').attr('r', 0);
-    exitTrans.select('text.label').style('font-size', '0px');
+    exitTrans.select('text.label').attr('font-size', 0);
     exitTrans.remove();
     links.exit().remove();
 
@@ -115,8 +115,8 @@ function animate(frame, i) {
     if (all_frames.length - 1 == frame_index && is_playing) { 
         player_timeouts = [];
         is_playing = false;
-        d3.select('#button-label').text('play');
-        d3.select('#play button').html('&#9654;');
+        d3.select('#button-label').text('Play');
+        d3.select('#play button').classed('playing', is_playing);
     }
 
     updateFrameNarrative(frame);
@@ -235,24 +235,54 @@ function setupEventListeners() {
     });
     // I want the slider to always be in focus because I like to use the arrow keys
     d3.select('html').on('click', function() { $('.ui-slider-handle').focus(); });
+    $( "#dialog-modal" ).dialog({
+        autoOpen: false,
+        modal: true,
+        title: "About this visualization",
+        width: 600,
+        buttons: [ { text: "OK", click: function() { $( this ).dialog( "close" ); } } ]
+    });
+ 
+    $( "#about" ).click(function() {
+      $( "#dialog-modal" ).dialog( "open" );
+    });
+    $( "#zoom-slider" ).slider({
+      orientation: "vertical",
+      range: "min",
+      min: MIN_ZOOM,
+      max: MAX_ZOOM,
+      value: MIN_ZOOM,
+      slide: function( event, ui ) {
+          console.log(ui);
+            var evt = document.createEvent("WheelEvent");
+            evt.initWebKitWheelEvent(0, (ui.value - zoom_level), window); 
+            document.getElementById('zoom-wrap').dispatchEvent(evt);
+        //zoom(ui.value, translation);
+      }
+    });
 }
 
 function redraw() {
-    zoom_level = d3.event.scale;
-    svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    zoom(d3.event.scale, d3.event.translate);
+}
+
+function zoom(zoom, translate) {
+    zoom_level = zoom;
+    svg.attr("transform", "translate(" + translate + ")scale(" + zoom_level + ")");
     d3.selectAll('circle')
-        .attr('r', function(n) { return radius(n.normedSize) / d3.event.scale; })
-        .style('stroke-width', function(n) { return 2 / d3.event.scale; });
+        .attr('r', function(n) { return radius(n.normedSize) / zoom_level; })
+        .style('stroke-width', function(n) { return 2 / zoom_level; });
     d3.selectAll('line.link')
-        .style('stroke-width', function() { return 1 / d3.event.scale; });
+        .style('stroke-width', function() { return 1 / zoom_level; });
     //This is a big performance killer when zooming - fix it
         //.attr('dy', function() { return LABEL_OFFSET + 'em'; });
         correctFontSizes();
+
 }
 
 function correctFontSizes() {
     d3.selectAll('g.node:not(.selected) text.label')
-        .style('font-size', function(n) {             
+        .attr('font-size', function(n) {             
             var zoomedFontSize = fontSize.range([minFontSize(zoom_level), MAX_FONT_SIZE]);
             d3.select(this).classed('hidden', function(n) {
                 return (d3.select('#show-labels:checked').empty() || zoomedFontSize(radius(n.normedSize)) < LABEL_SIZE_CUTOFF);
@@ -260,8 +290,8 @@ function correctFontSizes() {
             return zoomedFontSize(radius(n.normedSize)) / zoom_level;
         })
     d3.selectAll('g.node.selected text.label')
-        .style('font-size', function() {
-            return MAX_FONT_SIZE / zoom_level + 'px';
+        .attr('font-size', function() {
+            return MAX_FONT_SIZE / zoom_level;
         });
 }
 
@@ -304,7 +334,7 @@ function addText(group) {
         .attr('class', 'label')
         .text(function(n) { return n.label; })
         .classed('hidden', function(n) { return d3.select('#show-labels:checked').empty() || fontSize(radius(n.normedSize)) < LABEL_SIZE_CUTOFF; })
-        .style('font-size', function(n) {
+        .attr('font-size', function(n) {
             return fontSize(radius(n.normedSize));
         });
 }
@@ -337,7 +367,7 @@ function updateCircle(trans) {
 function updateText(trans) {
     trans
         .select('text.label')
-        .style('font-size', function(n) {
+        .attr('font-size', function(n) {
             return fontSize(radius(n.normedSize));
         })
     //.each('end', function() { d3.select(this).attr('dy', '0.3em'); })
@@ -453,11 +483,15 @@ function histogram(frames) {
     d3.select('#histogram').selectAll('.bar').data(data)
         .enter()
         .append('div')
+        .attr('class', 'bar-wrap')
+        .style('width', function() { return barWidth + 'px'; })
+        .style('height', function(d) { return histScale.range()[1] + 'px'; })
+        .style('margin-left', function(d, i) { return i == 0 ? 0 : HIST_MARGIN + 'px'; })
+        .on('click', function(d, i) { changeToFrame(i); })
+        .append('div')
         .attr('class', 'bar')
         .attr('title', function(d) { return d + ' sites'; })
-        .style('width', function() { return barWidth + 'px'; })
-        .style('height', function(d) { return histScale(d) + 'px'; })
-        .style('margin-left', function(d, i) { return i == 0 ? 0 : HIST_MARGIN + 'px'; });
+        .style('height', function(d) { return histScale(d) + 'px'; });
 }
 
 function updateHistogram(i) {
@@ -490,8 +524,8 @@ function highlightNode(node) {
     }
     d3.select(this).select('text.label')
         .classed('hidden', false)
-        .style('font-size', function(n) {
-            return MAX_FONT_SIZE / zoom_level + 'px';
+        .attr('font-size', function(n) {
+            return MAX_FONT_SIZE / zoom_level;
         });
     d3.selectAll('g.node').classed('not-selected', function(n) { return n != node; });
     populateNodeInfo(node);
@@ -573,7 +607,8 @@ function normalizeSize(size_range, size) {
 function populateNodeInfo(node) {
     d3.select('#node-info').html(
         nodeFieldsToShow.map(function(field) {
-            return '<dt>' + field.label + '</dt><dd>' + node[field.key] + '</dd>';
+            value = field.key == 'url' ? '<a href="' + node[field.key] + '" target="_blank">' + node[field.key] + '</a>' : node[field.key];
+            return '<dt>' + field.label + '</dt><dd>' + value + '</dd>';
         }).reduce(function(prev, curr) { return prev + curr; })
         + '<dt>Inbound Links</dt><dd>' + getNodeLinks(node, 'inbound')[0].length + '</dd>'
         + '<dt>Outbound Links</dt><dd>' + getNodeLinks(node, 'outbound')[0].length + '</dd>'
@@ -600,8 +635,8 @@ function play_toggle(frames) {
         });
         player_timeouts = [];
         is_playing = false;
-        d3.select('#button-label').text('play');
-        d3.select('#play button').html('&#9654;');
+        d3.select('#button-label').text('Play');
+        d3.select('#play button').classed('playing', is_playing);
     } else {
         frames.forEach(function(frame, i) {
             if (last_value == frames.length - 1) { last_value = 0; }
@@ -610,8 +645,8 @@ function play_toggle(frames) {
             }
         })
         is_playing = true;
-        d3.select('#button-label').text('pause');
-        d3.select('#play button').html('||');
+        d3.select('#button-label').text('Pause');
+        d3.select('#play button').classed('playing', is_playing);
     }
 }
 

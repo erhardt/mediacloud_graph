@@ -6,6 +6,9 @@ a:hover {color:#3c7718;}
 a:active {color:#3c7718;}
 a:visited {color:#3c7718;}
 
+html {
+    overflow-y: scroll;
+}
 body{
 	font-family:"Open Sans", Helvetica, sans-serif; 
 	font-size:11pt; margin:0px; 
@@ -24,11 +27,12 @@ body{
 
 #logo{	float:right; 
 		margin:0px; padding:0px;
+        margin-left: 20px;
 }
 
 #title {	float:right; 
 		text-align:right; 
-		padding:5px 15px 5px 0px; 
+		padding:8px 0px 5px 0px; 
 		font-family:"Lustria", 'Times New Roman', Times, serif; 
 		font-weight:bold; 
 		font-size:20pt; 
@@ -37,11 +41,12 @@ body{
 
 #navigation {float:right; 
 		text-align:right; 
-		padding:0px 15px 5px 0px;
+		padding:0px 0px 5px 0px;
 }
 
 #subtitle {width:100%; 
-		text-align:left; 
+		text-align:right; 
+        padding-top: 48px;
 		margin-bottom:10px; 
 		font-weight:bold; 
 		color:#999966; 
@@ -80,7 +85,8 @@ body{
 #map {	margin-left:5px; 
 		float:right; 
 		height:auto; 
-		width:580px
+		width:580px;
+        position: relative;
 }
 
 #mapImage {border:1px #000 solid; 
@@ -130,7 +136,8 @@ body{
 #footer {width:100%; 
 		margin-top:10px; 
 		border-top:2px dotted #92c5f3; 
-		padding:10px 0px 10px 0px; 
+		padding:3px 0px 0px 0px; 
 		text-align:right; 
 		font-style:italic; 
+        font-size: 0.8em;
 }

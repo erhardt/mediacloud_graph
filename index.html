@@ -6,12 +6,12 @@
         <title>Media Cloud Controversy Mapper</title>
         <link rel="stylesheet" type="text/css" href="stylin.css" />
         <script src="d3.v2.js"></script>
-        <link href="jquery-ui/css/smoothness/jquery-ui-1.9.0.custom.css" rel="stylesheet">
+        <link href="jquery-ui/css/smoothness/jquery-ui-1.10.2.custom.min.css" rel="stylesheet">
         <link href='//fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
         <link href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
         <link href="style.css" rel="stylesheet">
-        <script src="jquery-ui/js/jquery-1.8.2.js"></script>
-        <script src="jquery-ui/js/jquery-ui-1.9.0.custom.js"></script>
+        <script src="jquery-ui/js/jquery-1.9.1.js"></script>
+        <script src="jquery-ui/js/jquery-ui-1.10.2.custom.min.js"></script>
         <script src="colorbrewer.js"></script>
         <script src="siteCategories.js"></script>
     </head>
@@ -20,17 +20,30 @@
             <div id="header">
                 <div id="logo"><img src="images/mcLogo.gif" width="140" height="118" alt="logo" /></div>
                 <div id="title">Media Cloud Controversy Mapper</div>
-                <br />
-                <br />
-                <br />
-                <div id="navigation"><a href="index.html"><strong>Home</strong></a> &nbsp; &nbsp; &nbsp; <a href="about.html">About</a></div>
+                <div id="subtitle">Mapping the SOPA/PIPA Debate</div>
+                <div id="navigation"><a href="#" id="about">About this visualization</a></div>
                 <div style="clear:both"></div>
             </div>
             <!--end header-->
-            <div id="subtitle">I'm the title of a topic! I can go on for quite a while!</div>
             <div id="content">
-                <div id="aboutProject">
-                    I'm a very short information piece about this project, an overall description of what's going on that stays no matter what.
+                <div id="dialog-modal">
+                    Drawing from the paper Mobilizing for political action: the
+                    networked public sphere in the SOPA-PIPA debate in the US,
+                    this interactive visualization maps the evolution of
+                    a public controversy by collecting time slices of thousands
+                    of sources, then using link analysis to map the progress of
+                    the debate over time. We map which media sources (&quot;nodes&quot;,
+                    which appear as circles on the map with different colors
+                    denoting different media types) using a platform developed
+                    in part for such work, Media Cloud. We are able to map who
+                    is saying what and who is citing whom at any point in the
+                    emerging public conversation. What emerged from our study
+                    of over 10,000 articles, web pages, and blog posts that
+                    discussed SOPA, PIPA, or COICA over a period of 18 months
+                    was a network map that supports the proposition that what
+                    we had seen was quite a different game from what we had
+                    seen in the traditional, mass-mediated public sphere.
+                    Selected maps from the paper are included here.
                 </div>
                 <div id="start-date"></div>
                 <div id="frame-info"><p></p></div>
@@ -44,38 +57,30 @@
             </div>
             <!--end content-->
             <div id="map">
+                <!-- <div id="zoom-slider"></div> -->
                 <div id="graph"></div>
                 <div id="mapController">
                     <div id="histogram"></div>
                     <div id="controls">
-                        <div id="play"><button>&#9654;</button><span id="button-label">play</span></div>
+                        <span id="play"><button><span id="button-label">Play</span></button></span>
+                        <input type="checkbox" name="show-labels" checked="checked" id="show-labels" />
+                        <label for="show-labels">Show Labels</label> &nbsp; &nbsp;
+                        <input type="checkbox" name="show-links" id="show-links" />
+                        <label for="show-links">Show Links</label> &nbsp; &nbsp;
+                        <input type="checkbox" name="disable-trans" id="disable-trans" />
+                        <label for="disable-trans">Disable Transitions</label>
                         <div id="slider-wrapper">
-                        <div id="date-slider"></div>
+                            <div id="date-slider"></div>
                         </div>
-                        <!--
-                        <div id="slider"><img src="images/slider_square.gif" width="34" height="37" alt="slider" style="position:relative; left:20px;" /></div>
-                        <div id="dates">
-                            <div style="float:right">Date 2</div>
-                            Date1</div>
-                        -->
+                        <!--end of mapController-->
                         <div style="clear:both"></div>
                     </div>
                     <div style="clear:both"></div>
                 </div>
-                <div id="selectors">
-                    <input type="checkbox" name="show-labels" id="show-labels" />
-                    <label for="show-labels">Show Labels</label> &nbsp; &nbsp;
-                    <input type="checkbox" name="show-links" id="show-links" />
-                    <label for="show-links">Show Links</label> &nbsp; &nbsp;
-                    <input type="checkbox" name="disable-trans" id="disable-trans" />
-                    <label for="disable-trans">Disable Transitions</label>
-                    <!--end of mapController-->
-                </div>
                 <!--end selectors--></div>
             <!--end map area-->
             <div style="clear:both"></div>
-            <div id="footer">A project of the <a href="http://cyber.law.harvard.edu/" target="_blank">Berkman Center for Internet &amp; Society</a> at Harvard<br />
-                Copyright &copy; 2013 MediaCloud.</div>
+            <div id="footer">Media Cloud is a project of the <a href="http://cyber.law.harvard.edu">Berkman Center for Internet &amp; Society</a> at Harvard University and <a href="http://civic.mit.edu">Center for Civic Media</a> at MIT.</div>
         </div>
         <!--end container-->
         <script src="graph.js"></script>
