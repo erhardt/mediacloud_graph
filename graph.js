@@ -247,6 +247,7 @@ function setupEventListeners() {
         buttons: [ { text: "OK", click: function() { $( this ).dialog( "close" ); } } ]
     });
  
+    d3.select('#zoom-level').text(function() { return 'Zoom: ' + zoom_level.toFixed(1) + 'x'; });
 
     $( "#about" ).click(function() {
       $( "#dialog-modal" ).dialog( "open" );
@@ -273,6 +274,7 @@ function redraw() {
 
 function zoom(zoom, translate) {
     zoom_level = zoom;
+    d3.select('#zoom-level').text(function() { return 'Zoom: ' + zoom_level.toFixed(1) + 'x'; });
     svg.attr("transform", "translate(" + translate + ")scale(" + zoom_level + ")");
     d3.selectAll('circle')
         .attr('r', function(n) { return radius(n.normedSize) / zoom_level; })
