@@ -210,6 +210,10 @@ function setupLegend(siteCategories) {
     });
 }
 
+function titleToNode(title) {
+    return d3.selectAll('g.node').filter(function(d) { return d.label == title; });
+}
+
 function setupEventListeners() {
     d3.select('#show-links').on('click', function() {
         if (!d3.select(this).filter(':checked').empty()) {
@@ -243,6 +247,7 @@ function setupEventListeners() {
         buttons: [ { text: "OK", click: function() { $( this ).dialog( "close" ); } } ]
     });
  
+
     $( "#about" ).click(function() {
       $( "#dialog-modal" ).dialog( "open" );
     });
@@ -378,7 +383,7 @@ function updateLink(links, frame) {
     //minimizeLinks(links);
 }
 
-function updateFrameNarrative(frame) {
+function formatDateRange(start_date, end_date) {
     var month_names = new Array ( );
     month_names[month_names.length] = "January";
     month_names[month_names.length] = "February";
@@ -402,36 +407,46 @@ function updateFrameNarrative(frame) {
     day_names[day_names.length] = "Friday";
     day_names[day_names.length] = "Saturday";
 
-    if (frame.narrative) {
-        d3.select('#frame-info p').text(frame.narrative);
+    if (start_date.getUTCMonth() == end_date.getUTCMonth()) {
+        return month_names[start_date.getUTCMonth()].substr(0, 3)
+        + ' ' + start_date.getUTCDate()
+        + ' - ' + end_date.getUTCDate()
+        + ', ' + end_date.getFullYear();
+    } else if (start_date.getFullYear() == end_date.getFullYear()) {
+        return month_names[start_date.getUTCMonth()].substr(0, 3)
+        + ' ' + start_date.getUTCDate()
+        + ' - ' + month_names[end_date.getUTCMonth()].substr(0, 3)
+        + ' ' + end_date.getUTCDate()
+        + ', ' + end_date.getFullYear();
     } else {
-        d3.select('#frame-info p').text('');
+        return month_names[start_date.getUTCMonth()].substr(0, 3)
+        + ' ' + start_date.getUTCDate()
+        + ', ' + start_date.getFullYear();
+        + ' - ' + month_names[end_date.getUTCMonth()].substr(0, 3)
+        + ' ' + end_date.getUTCDate()
+        + ', ' + end_date.getFullYear();
     }
+}
+
+function updateFrameNarrative(frame) {
+
+    if (frame.narrative) {
+        d3.select('#frame-info p').html(linkNodes(frame.narrative));
+    } else {
+        d3.select('#frame-info p').html('');
+    }
+
+    d3.selectAll('.node-link').on('click', function() {
+        unhighlightNode();
+        var node = titleToNode(d3.select(this).attr('title'));
+        highlightNode.call(node.node(), node.datum());
+        d3.event.preventDefault();
+    }, true);
 
     if (frame.start_date && frame.end_date) {
         var start_date = new Date(frame.start_date),
             end_date   = new Date(frame.end_date);
-        d3.select('#start-date').text(function() { 
-            if (start_date.getUTCMonth() == end_date.getUTCMonth()) {
-                return month_names[start_date.getUTCMonth()].substr(0, 3)
-                + ' ' + start_date.getUTCDate()
-                + ' - ' + end_date.getUTCDate()
-                + ', ' + end_date.getFullYear();
-            } else if (start_date.getFullYear() == end_date.getFullYear()) {
-                return month_names[start_date.getUTCMonth()].substr(0, 3)
-                + ' ' + start_date.getUTCDate()
-                + ' - ' + month_names[end_date.getUTCMonth()].substr(0, 3)
-                + ' ' + end_date.getUTCDate()
-                + ', ' + end_date.getFullYear();
-            } else {
-                return month_names[start_date.getUTCMonth()].substr(0, 3)
-                + ' ' + start_date.getUTCDate()
-                + ', ' + start_date.getFullYear();
-                + ' - ' + month_names[end_date.getUTCMonth()].substr(0, 3)
-                + ' ' + end_date.getUTCDate()
-                + ', ' + end_date.getFullYear();
-            }
-        });
+        d3.select('#start-date').text(formatDateRange(start_date, end_date));
     } else {
         d3.select('#start-date').text('');
     }
@@ -480,18 +495,18 @@ function histogram(frames) {
         histScale = d3.scale.linear().domain([0, Math.max.apply(null, data)]).range([3, d3.select('#histogram').node().clientHeight]),
         barWidth = (d3.select('#histogram').node().clientWidth - (data.length - 1) * HIST_MARGIN) / data.length;
 
-    d3.select('#histogram').selectAll('.bar').data(data)
+    d3.select('#histogram').selectAll('.bar').data(frames)
         .enter()
         .append('div')
         .attr('class', 'bar-wrap')
+        .attr('title', function(d) { return formatDateRange(new Date(d.start_date), new Date(d.end_date)) + ': ' + d.nodes.length + ' sites';})
         .style('width', function() { return barWidth + 'px'; })
         .style('height', function(d) { return histScale.range()[1] + 'px'; })
         .style('margin-left', function(d, i) { return i == 0 ? 0 : HIST_MARGIN + 'px'; })
         .on('click', function(d, i) { changeToFrame(i); })
         .append('div')
         .attr('class', 'bar')
-        .attr('title', function(d) { return d + ' sites'; })
-        .style('height', function(d) { return histScale(d) + 'px'; });
+        .style('height', function(d) { return histScale(d.nodes.length) + 'px'; });
 }
 
 function updateHistogram(i) {
@@ -516,6 +531,7 @@ function getNodeLinks(node, type) {
 }
 
 function highlightNode(node) {
+    d3.select('#mediaSource').style('display', 'block');
     d3.select(this).classed('selected', true);
     selected_node = this.id.slice(5);
 
@@ -534,6 +550,7 @@ function highlightNode(node) {
 }
 
 function unhighlightNode() {
+    d3.select('#mediaSource').style('display', 'none');
     selected_node = null;
     d3.selectAll('g.node').classed('not-selected', false).classed('selected', false);
     hideLinks(d3.selectAll('line.link'));
@@ -603,6 +620,9 @@ function denormalizePosition(position) {
 function normalizeSize(size_range, size) {
     var sizeScale = d3.scale.linear().domain([5, 50]).range([0,1]);
     return sizeScale(size);
+}
+function linkNodes(text) {
+    return text.replace(/\[([^\]]*)::([^\]]*)\]/g, '<a href="#" class="node-link" title="$2">$1</a>');
 }
 function populateNodeInfo(node) {
     d3.select('#node-info').html(

@@ -119,6 +119,10 @@ line.link {
 #node-narrative p {
     margin: 0 0 2em 0;
 }
+#node-name {
+    margin-bottom: 1em;
+    font-weight: bold;
+}
 #dialog-modal {
     font-size: 0.8em;
     line-height: 1.7em;
