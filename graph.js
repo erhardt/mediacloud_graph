@@ -434,6 +434,7 @@ function updateFrameNarrative(frame) {
 
     if (frame.narrative) {
         d3.select('#frame-info p').html(linkNodes(frame.narrative));
+        d3.select('#frame-info p').property('scrollTop', 0);
     } else {
         d3.select('#frame-info p').html('');
     }
