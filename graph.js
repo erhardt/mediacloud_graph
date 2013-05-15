@@ -450,6 +450,7 @@ function updateFrameNarrative(frame) {
         var start_date = new Date(frame.start_date),
             end_date   = new Date(frame.end_date);
         d3.select('#start-date').text(formatDateRange(start_date, end_date));
+        d3.select('#site-count').text(frame.nodes.length + ' sites');
     } else {
         d3.select('#start-date').text('');
     }

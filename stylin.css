@@ -75,6 +75,11 @@ body{
         text-align: center;
 }
 
+#site-count {
+		font-size: 12pt;
+        text-align: center;
+}
+
 #mediaSource  {border:dotted #ababab 1px; 
 		padding:5px; 
 		margin-top:15px; 
