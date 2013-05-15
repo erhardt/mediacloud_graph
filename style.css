@@ -142,3 +142,8 @@ line.link {
     bottom: 0;
     font-size: 0.75em;
 }
+#quick-info {
+    font-size: 0.6em;
+    margin-top: 0.4em;
+    text-align: right;
+}
