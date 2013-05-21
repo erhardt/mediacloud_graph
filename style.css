@@ -147,3 +147,9 @@ line.link {
     margin-top: 0.4em;
     text-align: right;
 }
+#instruct {
+    font-size: 0.7em;
+    margin-top: 0.5em;
+    margin-right: 14em;
+    text-align: right;
+}
