@@ -66,12 +66,13 @@ line.link {
     background-position: -48px -80px, 0% 0%;
     background-repeat: no-repeat, no-repeat;
     text-indent: -99999px;
-    display: inline-block;
     overflow: hidden;
     padding: 0;
     width: 17px;
     height: 16px;
-    margin-left: 1em;
+    position: absolute;
+    top: 5px;
+    right: 5px;
 }
 button:hover {
     cursor: pointer;
