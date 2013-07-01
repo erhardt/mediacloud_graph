@@ -1,3 +1,6 @@
+svg {
+    overflow: hidden;
+}
 g.node {
     cursor: pointer;
 }
@@ -48,11 +51,33 @@ line.link {
     width: 20%;
     text-align: center;
 }
-#play button:hover {
+#play button {
+    width: 60%;
+    padding: 0.1em 1em 0.2em;
+}
+#pop-out {
+    background-image: url(jquery-ui/css/smoothness/images/ui-icons_eeeeee_256x240.png), -webkit-linear-gradient(top, #5FA9EE, #5F91D3); 
+    background-image: url(jquery-ui/css/smoothness/images/ui-icons_eeeeee_256x240.png), -webkit-gradient(linear, 0% 0%, 0% 100%, from(#5FA9EE), to(#5F91D3));
+    background-image: url(jquery-ui/css/smoothness/images/ui-icons_eeeeee_256x240.png), -webkit-linear-gradient(top, #5FA9EE, #5F91D3); 
+    background-image: url(jquery-ui/css/smoothness/images/ui-icons_eeeeee_256x240.png), -moz-linear-gradient(top, #5FA9EE, #5F91D3);
+    background-image: url(jquery-ui/css/smoothness/images/ui-icons_eeeeee_256x240.png), -ms-linear-gradient(top, #5FA9EE, #5F91D3);
+    background-image: url(jquery-ui/css/smoothness/images/ui-icons_eeeeee_256x240.png), -o-linear-gradient(top, #5FA9EE, #5F91D3);
+    background-image: url(jquery-ui/css/smoothness/images/ui-icons_eeeeee_256x240.png), linear-gradient(top, #5FA9EE, #5F91D3);
+    background-position: -48px -80px, 0% 0%;
+    background-repeat: no-repeat, no-repeat;
+    text-indent: -99999px;
+    display: inline-block;
+    overflow: hidden;
+    padding: 0;
+    width: 17px;
+    height: 16px;
+    margin-left: 1em;
+}
+button:hover {
     cursor: pointer;
 }
 
-#play button {
+button {
     border:0;
     font-family: "Open Sans";
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#5FA9EE), to(#5F91D3));
@@ -62,12 +87,11 @@ line.link {
     background-image:      -o-linear-gradient(top, #5FA9EE, #5F91D3);
     background-image:         linear-gradient(top, #5FA9EE, #5F91D3);
     border-radius: 3px;
-    padding: 0.1em 1em 0.2em;
     color: #eee;
     margin-top: 0;
     margin-bottom: 0.3em;
-    width: 60%;
 }
+
 #play button.playing {
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, to(#5FA9EE), from(#689ADD));
     background-image: -webkit-linear-gradient(top, #689ADD, #5FA9EE); 
@@ -80,7 +104,7 @@ line.link {
 #histogram {
     white-space: nowrap;
     padding: 0;
-    margin: 0;
+    margin: 0 auto;
 }
 #histogram .bar-wrap {
     display: inline-block;
@@ -89,7 +113,18 @@ line.link {
     cursor: pointer;
 }
 #histogram .bar-wrap:hover {
+    -moz-transition: background-color 0.1s;
+    -webkit-transition: background-color 0.1s;
+    -o-transition: background-color 0.1s;
+    transition: background-color 0.1s;
     background-color: #F3E5B7;
+}
+#histogram .bar-wrap:hover .bar {
+    -moz-transition: background-color 0.1s;
+    -webkit-transition: background-color 0.1s;
+    -o-transition: background-color 0.1s;
+    transition: background-color 0.1s;
+    background-color: #C7AD6A;
 }
 #histogram .bar {
     background-color: #9B9C77;

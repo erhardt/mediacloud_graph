@@ -1,33 +1,53 @@
-var GRAPH_WIDTH       = 570,
-    GRAPH_HEIGHT      = 500,
-    MAX_SIZE          = 20,
-    MIN_SIZE          = 3,
-    MAX_FONT_SIZE     = 36,
-    MIN_FONT_SIZE     = 3,
-    MAX_MIN_ZOOM_FONT_SIZE = 10,
-    X_MARGIN          = 60,
-    HIST_MARGIN       = 4,
-    Y_MARGIN          = 60,
-    DURATION          = 1500,
-    LINK_DELAY_WITH_TRANS = 1300,
-    LINK_DELAY_NO_TRANS = 50,
-    LINK_DELAY        = LINK_DELAY_WITH_TRANS,
-    LINK_DURATION     = 1000,
-    TIMEOUT           = LINK_DELAY + LINK_DURATION + 750,
-    LABEL_SIZE_CUTOFF = 4,
-    ZOOM_SPEED        = 0.3,
-    MAX_ZOOM          = 10,
-    MIN_ZOOM          = 1,
-    LABEL_OFFSET      = 0.3,
-    PI_TIME           = 0,
-    MAX_PI_TIME       = 100,
-    DISABLE_TRANS     = false,
-    is_playing        = false,
-    player_timeouts   = [],
-    last_value        = 0,
-    radius            = d3.scale.linear().domain([0,1]).range([MIN_SIZE, MAX_SIZE]),
-    fontSize          = d3.scale.linear().domain([MIN_SIZE,MAX_SIZE]).range([MIN_FONT_SIZE, MAX_FONT_SIZE]).clamp(true),
-    minFontSize       = d3.scale.linear().domain([1,MAX_ZOOM]).range([MIN_FONT_SIZE, MAX_MIN_ZOOM_FONT_SIZE]).clamp(true),
+var DEFAULT_PARAMS = {
+        GRAPH_WIDTH            : 570,
+        GRAPH_HEIGHT           : 500,
+        MAX_SIZE               : 20,
+        MIN_SIZE               : 2,
+        MAX_FONT_SIZE          : 36,
+        MIN_FONT_SIZE          : 4,
+        MAX_MIN_ZOOM_FONT_SIZE : 10,
+        X_MARGIN               : 60,
+        HIST_MARGIN            : 4,
+        Y_MARGIN               : 60,
+        DURATION               : 1500,
+        LINK_DELAY_WITH_TRANS  : 1300,
+        LINK_DELAY_NO_TRANS    : 50,
+        LINK_DURATION          : 1000,
+        LABEL_SIZE_CUTOFF      : 6,
+        ZOOM_SPEED             : 1,
+        MAX_ZOOM               : 10,
+        MIN_ZOOM               : 1,
+        LABEL_OFFSET           : 0.3,
+        PI_TIME                : 0,
+        MAX_PI_TIME            : 100
+    },
+    POPPED_OUT_PARAMS = {
+        GRAPH_WIDTH       : $(window).width() * 0.8 - 37,
+        GRAPH_HEIGHT      : $(window).height() * 0.7,
+        MAX_SIZE          : 30,
+        MIN_SIZE          : 3,
+        MAX_FONT_SIZE     : 42,
+        MIN_FONT_SIZE     : 8,
+        LABEL_SIZE_CUTOFF : 9 
+    };
+
+$.extend(window, DEFAULT_PARAMS);
+
+var LINK_DELAY      = LINK_DELAY_WITH_TRANS,
+    TIMEOUT         = LINK_DELAY + LINK_DURATION + 750,
+    DISABLE_TRANS   = false,
+    is_playing      = false,
+    player_timeouts = [],
+    last_value      = 0,
+    radius          = d3.scale.linear()
+                            .domain([0,1])
+                            .range([MIN_SIZE, MAX_SIZE]),
+    fontSize          = d3.scale.linear()
+                            .domain([MIN_SIZE,MAX_SIZE])
+                            .range([MIN_FONT_SIZE, MAX_FONT_SIZE]).clamp(true),
+    minFontSize       = d3.scale.linear()
+                            .domain([1,MAX_ZOOM])
+                            .range([MIN_FONT_SIZE, MAX_MIN_ZOOM_FONT_SIZE]).clamp(true),
     //siteCategory      = d3.scale.ordinal().domain(siteCategories).range(colorbrewer.Set3[11]);
     siteCategory      = d3.scale.category20(),
     zoom_level        = 1
@@ -44,7 +64,9 @@ if (PI_TIME >= MAX_PI_TIME) {
     LINK_DELAY = LINK_DELAY_NO_TRANS;
     DISABLE_TRANS = true;
 }
-var svg = setupGraph();
+
+var svg = setupGraph('#graph');
+
 //setupLegend(siteCategories);
 
 d3.json('test_frames.json', function(frames) {
@@ -150,8 +172,8 @@ function animate(frame, i) {
     }
 }
 
-function setupGraph() {
-    var svg = d3.select("#graph")
+function setupGraph(selector) {
+    var svg = d3.select(selector)
         .append("svg")
         .attr("width", GRAPH_WIDTH)
         .attr("height", GRAPH_HEIGHT)
@@ -259,13 +281,67 @@ function setupEventListeners() {
       max: MAX_ZOOM,
       value: MIN_ZOOM,
       slide: function( event, ui ) {
-          console.log(ui);
-            var evt = document.createEvent("WheelEvent");
-            evt.initWebKitWheelEvent(0, (ui.value - zoom_level), window); 
-            document.getElementById('zoom-wrap').dispatchEvent(evt);
+          var evt = document.createEvent("WheelEvent");
+          evt.initWebKitWheelEvent(0, (ui.value - zoom_level), window); 
+          document.getElementById('zoom-wrap').dispatchEvent(evt);
         //zoom(ui.value, translation);
       }
     });
+
+    d3.select('#pop-out').on('click', popOut);
+}
+
+function popOut() {
+    unhighlightNode();
+    $.extend(window, POPPED_OUT_PARAMS);
+    radius = d3.scale.linear()
+                     .domain([0,1])
+                     .range([MIN_SIZE, MAX_SIZE]);
+    fontSize = d3.scale.linear()
+                     .domain([MIN_SIZE,MAX_SIZE])
+                     .range([MIN_FONT_SIZE, MAX_FONT_SIZE]).clamp(true);
+    minFontSize = d3.scale.linear()
+                     .domain([1,MAX_ZOOM])
+                     .range([MIN_FONT_SIZE, MAX_MIN_ZOOM_FONT_SIZE]).clamp(true);
+    zoom_level = 1;
+
+    $('#map').dialog({
+        modal: true,
+        position: {my: 'center top', at: 'center top', of: window},
+        width: $(window).width() * 0.8,
+        close: popIn
+    }).addClass('popped-out');
+    $('#graph svg').remove();
+    $('#pop-out').css('display', 'none');
+
+    svg = setupGraph('#graph');
+    animate(all_frames[0]);
+    histogram(all_frames);
+    updateHistogram(0);
+}
+
+function popIn() {
+    unhighlightNode();
+    $.extend(window, DEFAULT_PARAMS);
+    radius = d3.scale.linear()
+                     .domain([0,1])
+                     .range([MIN_SIZE, MAX_SIZE]);
+    fontSize = d3.scale.linear()
+                     .domain([MIN_SIZE,MAX_SIZE])
+                     .range([MIN_FONT_SIZE, MAX_FONT_SIZE]).clamp(true);
+    minFontSize = d3.scale.linear()
+                     .domain([1,MAX_ZOOM])
+                     .range([MIN_FONT_SIZE, MAX_MIN_ZOOM_FONT_SIZE]).clamp(true);
+    zoom_level = 1;
+
+    $('#graph svg').remove();
+    $('#map').dialog('destroy').removeClass('popped-out');
+    $('#pop-out').css('display', 'inline');
+
+    svg = setupGraph('#graph');
+    animate(all_frames[0]);
+    histogram(all_frames);
+    updateHistogram(0);
 }
 
 function redraw() {
@@ -504,13 +580,16 @@ function histogram(frames) {
         .append('div')
         .attr('class', 'bar-wrap')
         .attr('title', function(d) { return formatDateRange(new Date(d.start_date), new Date(d.end_date)) + ': ' + d.nodes.length + ' sites';})
-        .style('width', function() { return barWidth + 'px'; })
         .style('height', function(d) { return histScale.range()[1] + 'px'; })
-        .style('margin-left', function(d, i) { return i == 0 ? 0 : HIST_MARGIN + 'px'; })
         .on('click', function(d, i) { changeToFrame(i); })
         .append('div')
         .attr('class', 'bar')
         .style('height', function(d) { return histScale(d.nodes.length) + 'px'; });
+
+    d3.select('#histogram').selectAll('.bar-wrap')
+        .style('margin-left', function(d, i) { return i == 0 ? 0 : HIST_MARGIN + 'px'; })
+        .style('width', function() { return barWidth + 'px'; });
+
 }
 
 function updateHistogram(i) {
