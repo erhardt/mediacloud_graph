@@ -26,7 +26,7 @@ var DEFAULT_PARAMS = {
         GRAPH_HEIGHT      : $(window).height() * 0.7,
         MAX_SIZE          : 30,
         MIN_SIZE          : 3,
-        MAX_FONT_SIZE     : 42,
+        MAX_FONT_SIZE     : 36,
         MIN_FONT_SIZE     : 8,
         LABEL_SIZE_CUTOFF : 9 
     };
@@ -48,7 +48,6 @@ var LINK_DELAY      = LINK_DELAY_WITH_TRANS,
     minFontSize       = d3.scale.linear()
                             .domain([1,MAX_ZOOM])
                             .range([MIN_FONT_SIZE, MAX_MIN_ZOOM_FONT_SIZE]).clamp(true),
-    //siteCategory      = d3.scale.ordinal().domain(siteCategories).range(colorbrewer.Set3[11]);
     siteCategory      = d3.scale.category20(),
     zoom_level        = 1
     nodeFieldsToShow  = [
@@ -59,17 +58,9 @@ var LINK_DELAY      = LINK_DELAY_WITH_TRANS,
     all_frames        = null,
     selected_node     = null;
 
-PI_TIME = calculatePi();
-if (PI_TIME >= MAX_PI_TIME) {
-    LINK_DELAY = LINK_DELAY_NO_TRANS;
-    DISABLE_TRANS = true;
-}
-
 var svg = setupGraph('#graph');
 
-//setupLegend(siteCategories);
-
-d3.json('test_frames.json', function(frames) {
+d3.json('final_frames.json', function(frames) {
     var slider = $('#date-slider').slider({
         min: 0,
         max: frames.length - 1,
@@ -165,11 +156,6 @@ function animate(frame, i) {
     } else if (!d3.select('g.node.selected').empty()) {
         showLabels(d3.select('g.node.selected'));
     }
-
-    // If selected nodes are removed, make everything normal again
-    if (!exit.filter('.selected').empty()) {
-        //unhighlightNode();
-    }
 }
 
 function setupGraph(selector) {
@@ -221,15 +207,6 @@ function setupGraph(selector) {
     d3.select('#graph-wrapper').style('width', GRAPH_WIDTH + 'px');
 
     return svg;
-}
-
-function setupLegend(siteCategories) {
-    siteCategories.forEach(function(category) { 
-        var div = d3.select('#legend').append('div');
-        div.append('div').classed('legend-swatch', true)
-        .style('background-color', function() { return siteCategory(category); });
-        div.append('span').text(category.replace(/ \([^\(\)]*\)$/g, ''));
-    });
 }
 
 function titleToNode(title) {
@@ -284,7 +261,6 @@ function setupEventListeners() {
           var evt = document.createEvent("WheelEvent");
           evt.initWebKitWheelEvent(0, (ui.value - zoom_level), window); 
           document.getElementById('zoom-wrap').dispatchEvent(evt);
-        //zoom(ui.value, translation);
       }
     });
 
@@ -316,6 +292,7 @@ function popOut() {
 
     svg = setupGraph('#graph');
     animate(all_frames[0]);
+    last_value = 0;
     histogram(all_frames);
     updateHistogram(0);
 }
@@ -340,6 +317,7 @@ function popIn() {
 
     svg = setupGraph('#graph');
     animate(all_frames[0]);
+    last_value = 0;
     histogram(all_frames);
     updateHistogram(0);
 }
@@ -357,9 +335,7 @@ function zoom(zoom, translate) {
         .style('stroke-width', function(n) { return 2 / zoom_level; });
     d3.selectAll('line.link')
         .style('stroke-width', function() { return 1 / zoom_level; });
-    //This is a big performance killer when zooming - fix it
-        //.attr('dy', function() { return LABEL_OFFSET + 'em'; });
-        correctFontSizes();
+    correctFontSizes();
 
 }
 
@@ -392,9 +368,7 @@ function addGroup(nodes) {
 function addLink(frame, links) {
     var newLinks = links 
         .insert("line", 'g.node')
-        //.style('marker-end', 'url(#triangle)')
-        .classed('link', true)
-        .classed('hidden', true)
+        .attr('class', 'hidden link')
         .attr('id', function(l) { return 'link-' + l.source + '-' + l.target; })
         .datum(function(l) { return updateInteralLinkPosition(l, frame); });
 
@@ -405,7 +379,6 @@ function addCircle(group) {
     group
         .append('circle')
         .attr('r', 0)
-        //.style("fill", function(n) { return d3.rgb(n.color.r, n.color.g, n.color.b); });
         .style("fill", function(n) { return siteCategory(n.code_media_type); })
 }
 
@@ -439,11 +412,9 @@ function updateGroup(nodes) {
 }
 
 function updateCircle(trans) {
-    // Circle update
     trans
         .select('circle')
         .attr("r", function(n) { return radius(n.normedSize); })
-        //.style("fill", function(n) { return d3.rgb(n.color.r, n.color.g, n.color.b); })
         .style("fill", function(n) { return siteCategory(n.code_media_type); })
 }
 
@@ -453,12 +424,10 @@ function updateText(trans) {
         .attr('font-size', function(n) {
             return fontSize(radius(n.normedSize));
         })
-    //.each('end', function() { d3.select(this).attr('dy', '0.3em'); })
 }
 
 function updateLink(links, frame) {
     links.datum(function(l) { return updateInteralLinkPosition(l, frame); });
-    //minimizeLinks(links);
 }
 
 function formatDateRange(start_date, end_date) {
@@ -499,7 +468,7 @@ function formatDateRange(start_date, end_date) {
     } else {
         return month_names[start_date.getUTCMonth()].substr(0, 3)
         + ' ' + start_date.getUTCDate()
-        + ', ' + start_date.getFullYear();
+        + ', ' + start_date.getFullYear()
         + ' - ' + month_names[end_date.getUTCMonth()].substr(0, 3)
         + ' ' + end_date.getUTCDate()
         + ', ' + end_date.getFullYear();
@@ -543,18 +512,6 @@ function hideLabels(nodes) {
 }
 
 function showLinks(links, delay) {
-
-    /*
-    links.each(function(link) {
-        d3.selectAll('g.node').filter(function(node) {
-            return link.source == node.index;
-        }).select('circle').transition().style('fill', '#ee2222').style('fill-opacity', 1);
-        d3.selectAll('g.node').filter(function(node) {
-            return link.target == node.index;
-        }).select('circle').transition().style('fill', '#2222ee').style('fill-opacity', 1);
-    })
-    */
-
     if (delay) {
         maximizeLinks(links.classed('hidden', false).transition().delay(delay).duration(LINK_DURATION));
     } else {
@@ -646,7 +603,6 @@ function unhighlightNode() {
 }
 
 function updateInteralLinkPosition(link, frame) {
-    // Gephi is giving us links that shouldn't exist - I think
     var sourceNode = d3.select('#node-' + link.source);
     var targetNode = d3.select('#node-' + link.target);
 
@@ -754,70 +710,3 @@ function play_toggle(frames) {
 }
 
 function changeToFrame(i) { $('#date-slider').slider('value', i); }
-    
-
-// This stuff is here to test benchmark, but it's not good right now.
-function testRendering() {
-    var startTest = top.startTest || function(){};
-    var test = top.test || function(name, fn){ fn(); };
-    var endTest = top.endTest || function(){};
-    var prep = top.prep || function(fn){ fn(); };
-
-    var ret, tmp;
-
-    var elem = document.getElementById("test");
-    var a = document.getElementsByTagName("a")[0];
-    var num = 10240;
-
-    var cur_time = Date.now();
-    //test( "getAttribute", function(){
-        for ( var i = 0; i < num; i++ )
-        ret = elem.getAttribute("id");
-    //});
-
-    //test( "element.property", function(){
-        for ( var i = 0; i < num * 2; i++ )
-        ret = elem.id;
-    //});
-
-    //test( "setAttribute", function(){
-        for ( var i = 0; i < num; i++ )
-        a.setAttribute("id", "foo");
-    //});
-
-    //test( "element.property = value", function(){
-        for ( var i = 0; i < num; i++ )
-        a.id = "foo";
-    //});
-
-    //test( "element.expando = value", function(){
-        for ( var i = 0; i < num; i++ )
-        a["test" + num] = function(){};
-    //});
-
-    //test( "element.expando", function(){
-        for ( var i = 0; i < num; i++ )
-        ret = a["test" + num];
-    //});
-
-    var end_time = Date.now();
-    var total_time = end_time - cur_time;
-    return total_time;
-}
-function calculatePi(){
-    var num = 1000000;
-    var pi=4,top=4,bot=3,minus = true;
-    var time = next(pi,top,bot,minus,num);
-    return time;
-}
-function next(pi,top,bot,minus,num){
-    var cur_time = Date.now();
-    for(var i=0;i<num;i++){
-        pi += (minus == true)?-(top/bot):(top/bot);
-        minus = !minus;
-        bot+=2;
-    }
-    var end_time = Date.now();
-    var total_time = end_time - cur_time;
-    return total_time;
-}
