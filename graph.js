@@ -526,7 +526,7 @@ function updateFrameNarrative(frame) {
         var start_date = new Date(frame.start_date),
             end_date   = new Date(frame.end_date);
         d3.select('#start-date').text(formatDateRange(start_date, end_date));
-        d3.select('#site-count').text(frame.nodes.length + ' sites');
+        d3.select('#site-count').text(frame.nodes.length + ' media sources');
     } else {
         d3.select('#start-date').text('');
     }
@@ -579,7 +579,7 @@ function histogram(frames) {
         .enter()
         .append('div')
         .attr('class', 'bar-wrap')
-        .attr('title', function(d) { return formatDateRange(new Date(d.start_date), new Date(d.end_date)) + ': ' + d.nodes.length + ' sites';})
+        .attr('title', function(d) { return formatDateRange(new Date(d.start_date), new Date(d.end_date)) + ': ' + d.nodes.length + ' media sources';})
         .style('height', function(d) { return histScale.range()[1] + 'px'; })
         .on('click', function(d, i) { changeToFrame(i); })
         .append('div')
